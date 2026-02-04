@@ -1,0 +1,18 @@
+node_modules
+dist
+.data
+.nitro
+.cache
+.output
+.env
+.env.local
+
+# Database files
+*.db
+*.db-shm
+*.db-wal
+data/*.db
+*.sqlite
+
+.DS_Store
+**/.DS_Store

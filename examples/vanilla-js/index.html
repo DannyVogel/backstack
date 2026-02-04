@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BackStack Example</title>
+  <style>
+    body { font-family: system-ui, sans-serif; max-width: 600px; margin: 40px auto; padding: 0 20px; }
+    button { padding: 10px 20px; margin: 5px; cursor: pointer; }
+    .status { padding: 10px; border-radius: 4px; margin: 10px 0; }
+    .success { background: #d4edda; color: #155724; }
+    .error { background: #f8d7da; color: #721c24; }
+    pre { background: #f4f4f4; padding: 10px; overflow-x: auto; }
+  </style>
+</head>
+<body>
+  <h1>BackStack Client Example</h1>
+
+  <h2>Push Notifications</h2>
+  <button id="subscribe">Subscribe</button>
+  <button id="unsubscribe">Unsubscribe</button>
+  <div id="pushStatus"></div>
+
+  <h2>Logger</h2>
+  <button id="logInfo">Log Info</button>
+  <button id="logError">Log Error</button>
+  <div id="logStatus"></div>
+
+  <h2>Example Items</h2>
+  <button id="createItem">Create Item</button>
+  <button id="listItems">List Items</button>
+  <div id="items"></div>
+
+  <script src="push-client.js"></script>
+  <script src="logger-client.js"></script>
+  <script>
+    const API_BASE = 'http://localhost:3000'
+
+    // Push Notifications
+    const pushManager = new PushNotificationClient({
+      baseUrl: API_BASE,
+      vapidPublicKey: 'YOUR_VAPID_PUBLIC_KEY', // Replace with actual key
+    })
+
+    document.getElementById('subscribe').onclick = async () => {
+      try {
+        await pushManager.subscribe()
+        showStatus('pushStatus', 'Subscribed!', 'success')
+      } catch (e) {
+        showStatus('pushStatus', e.message, 'error')
+      }
+    }
+
+    document.getElementById('unsubscribe').onclick = async () => {
+      try {
+        await pushManager.unsubscribe()
+        showStatus('pushStatus', 'Unsubscribed!', 'success')
+      } catch (e) {
+        showStatus('pushStatus', e.message, 'error')
+      }
+    }
+
+    // Logger
+    const logger = new LoggerClient({ baseUrl: API_BASE })
+
+    document.getElementById('logInfo').onclick = async () => {
+      try {
+        await logger.info('User clicked a button', { button: 'logInfo' })
+        showStatus('logStatus', 'Info logged!', 'success')
+      } catch (e) {
+        showStatus('logStatus', e.message, 'error')
+      }
+    }
+
+    document.getElementById('logError').onclick = async () => {
+      try {
+        await logger.error('Something went wrong', { context: 'test' })
+        showStatus('logStatus', 'Error logged!', 'success')
+      } catch (e) {
+        showStatus('logStatus', e.message, 'error')
+      }
+    }
+
+    // Example Items
+    document.getElementById('createItem').onclick = async () => {
+      const title = prompt('Item title:')
+      if (!title) return
+      try {
+        const res = await fetch(`${API_BASE}/example/items`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ title, content: 'Created from example client' })
+        })
+        const data = await res.json()
+        document.getElementById('items').innerHTML = `<pre>${JSON.stringify(data, null, 2)}</pre>`
+      } catch (e) {
+        showStatus('items', e.message, 'error')
+      }
+    }
+
+    document.getElementById('listItems').onclick = async () => {
+      try {
+        const res = await fetch(`${API_BASE}/example/items`)
+        const data = await res.json()
+        document.getElementById('items').innerHTML = `<pre>${JSON.stringify(data, null, 2)}</pre>`
+      } catch (e) {
+        showStatus('items', e.message, 'error')
+      }
+    }
+
+    function showStatus(elementId, message, type) {
+      const el = document.getElementById(elementId)
+      el.className = `status ${type}`
+      el.textContent = message
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,43 @@
+{
+  "name": "backstack",
+  "type": "module",
+  "version": "0.1.0",
+  "description": "Open-source template for multi-project backends",
+  "scripts": {
+    "build": "nitro build",
+    "dev": "nitro dev",
+    "dev:test": "node --env-file=.env.test node_modules/.bin/nitro dev",
+    "preview": "npx srvx --prod .output/",
+    "test": "vitest run",
+    "test:e2e": "vitest run --config vitest.config.ts",
+    "test:watch": "vitest --watch",
+    "lint": "eslint ."
+  },
+  "dependencies": {
+    "better-sqlite3": "^11.7.0",
+    "web-push": "^3.6.6"
+  },
+  "devDependencies": {
+    "@antfu/eslint-config": "^6.2.0",
+    "@types/better-sqlite3": "^7.6.11",
+    "@types/supertest": "^6.0.3",
+    "eslint": "^9.39.1",
+    "nitro": "latest",
+    "rolldown": "latest",
+    "supertest": "^7.2.2",
+    "vitest": "latest"
+  },
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/DannyVogel/backstack.git"
+  },
+  "keywords": [
+    "backend",
+    "nitro",
+    "api",
+    "push-notifications",
+    "logging",
+    "template"
+  ]
+}

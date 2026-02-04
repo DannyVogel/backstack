@@ -1,0 +1,32 @@
+# Render Blueprint for BackStack
+
+services:
+  - type: web
+    name: backstack
+    env: node
+    plan: free
+    buildCommand: npm ci && npm run build
+    startCommand: node .output/server/index.mjs
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: NITRO_DATABASE_PATH
+        value: /opt/render/project/data/backstack.db
+      - key: NITRO_PUSHER_API_KEY
+        sync: false
+      - key: NITRO_VAPID_PRIVATE_KEY
+        sync: false
+      - key: NITRO_VAPID_PUBLIC_KEY
+        sync: false
+      - key: NITRO_VAPID_EMAIL
+        sync: false
+      - key: NITRO_ALLOWED_ORIGINS
+        sync: false
+      - key: NITRO_LOGGER_API_KEY
+        sync: false
+      - key: NITRO_LOGGER_VIEWER_KEY
+        sync: false
+    disk:
+      name: backstack-data
+      mountPath: /opt/render/project/data
+      sizeGB: 1

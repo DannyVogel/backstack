@@ -1,0 +1,23 @@
+version: '3.8'
+
+services:
+  backstack:
+    build: .
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+      - NITRO_DATABASE_PATH=/app/data/backstack.db
+      - NITRO_PUSHER_API_KEY=${NITRO_PUSHER_API_KEY}
+      - NITRO_VAPID_PRIVATE_KEY=${NITRO_VAPID_PRIVATE_KEY}
+      - NITRO_VAPID_PUBLIC_KEY=${NITRO_VAPID_PUBLIC_KEY}
+      - NITRO_VAPID_EMAIL=${NITRO_VAPID_EMAIL}
+      - NITRO_ALLOWED_ORIGINS=${NITRO_ALLOWED_ORIGINS}
+      - NITRO_LOGGER_API_KEY=${NITRO_LOGGER_API_KEY}
+      - NITRO_LOGGER_VIEWER_KEY=${NITRO_LOGGER_VIEWER_KEY}
+    volumes:
+      - backstack-data:/app/data
+    restart: unless-stopped
+
+volumes:
+  backstack-data:
