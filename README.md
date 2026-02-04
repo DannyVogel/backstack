@@ -1,6 +1,6 @@
 # BackStack
 
-Open-source template for multi-project backends. Built with [Nitro](https://nitro.unjs.io/), SQLite, and TypeScript.
+Open-source template for multi-project backends. Built with [Nitro](https://v3.nitro.build), SQLite, and TypeScript.
 
 ## Features
 
@@ -27,7 +27,7 @@ cp .env.example .env
 npm run dev
 ```
 
-Visit `http://localhost:3000` to verify the server is running.
+Visit `http://localhost:8000` to verify the server is running.
 
 ## Project Structure
 
