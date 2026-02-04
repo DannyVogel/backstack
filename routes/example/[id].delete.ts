@@ -1,4 +1,4 @@
-import type { H3Event } from 'nitro/deps/h3'
+import type { H3Event } from 'nitro/h3'
 import { HTTPError } from 'h3'
 import { defineHandler, getRouterParam } from 'nitro/h3'
 import { deleteItem } from '~/server/example/controllers/items.controller'

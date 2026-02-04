@@ -1,4 +1,4 @@
-import type { H3Event } from 'nitro/deps/h3'
+import type { H3Event } from 'nitro/h3'
 import { HTTPError } from 'h3'
 import { loggerConfig } from '~/server/config/logger'
 import { logger } from '~/server/logger/logger'

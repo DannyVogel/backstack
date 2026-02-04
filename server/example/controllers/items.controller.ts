@@ -1,4 +1,4 @@
-import type { H3Event } from 'nitro/deps/h3'
+import type { H3Event } from 'nitro/h3'
 import type { CreateItemRequest, UpdateItemRequest } from '../types'
 import type { ExampleItemRow } from '~/server/database/types'
 import { getDatabase } from '~/server/database/index'

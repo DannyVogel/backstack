@@ -71,7 +71,7 @@ export interface MyItemRow {
 Create `server/myservice/controllers/main.controller.ts`:
 
 ```typescript
-import type { H3Event } from 'nitro/deps/h3'
+import type { H3Event } from 'nitro/h3'
 import type { MyItemRow } from '~/server/database/types'
 import { getDatabase } from '~/server/database/index'
 
@@ -97,7 +97,7 @@ export function createItem(event: H3Event, name: string, value: string): MyItemR
 Create `routes/myservice/index.get.ts`:
 
 ```typescript
-import type { H3Event } from 'nitro/deps/h3'
+import type { H3Event } from 'nitro/h3'
 import { defineHandler } from 'nitro/h3'
 import { getAllItems } from '~/server/myservice/controllers/main.controller'
 
@@ -110,7 +110,7 @@ export default defineHandler(async (event: H3Event) => {
 Create `routes/myservice/index.post.ts`:
 
 ```typescript
-import type { H3Event } from 'nitro/deps/h3'
+import type { H3Event } from 'nitro/h3'
 import type { CreateItemRequest } from '~/server/myservice/types'
 import { HTTPError } from 'h3'
 import { defineHandler, readBody } from 'nitro/h3'

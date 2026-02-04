@@ -1,4 +1,4 @@
-import type { H3Event } from 'nitro/deps/h3'
+import type { H3Event } from 'nitro/h3'
 import type { LogLevel, LogSource } from './types'
 import { addLog } from '~/server/database/methods/logs'
 

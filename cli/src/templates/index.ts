@@ -317,7 +317,7 @@ export function secureCompare(a: string | null | undefined, b: string | null | u
 }
 
 function getRateLimiter(): string {
-  return `import type { H3Event } from 'nitro/deps/h3'
+  return `import type { H3Event } from 'nitro/h3'
 import { HTTPError } from 'h3'
 
 const store = new Map<string, { count: number; resetAt: number }>()
@@ -345,7 +345,7 @@ export const rateLimiters = {
 }
 
 function getCorsMiddleware(): string {
-  return `import type { H3Event } from 'nitro/deps/h3'
+  return `import type { H3Event } from 'nitro/h3'
 import { defineEventHandler } from 'nitro/h3'
 import { corsConfig } from '~/server/config/cors'
 

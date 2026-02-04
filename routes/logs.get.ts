@@ -1,4 +1,4 @@
-import type { H3Event } from 'nitro/deps/h3'
+import type { H3Event } from 'nitro/h3'
 import { getCookie, setCookie } from 'h3'
 import { defineHandler } from 'nitro/h3'
 import { loggerConfig } from '~/server/config/logger'

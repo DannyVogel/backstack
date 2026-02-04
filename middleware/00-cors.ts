@@ -1,4 +1,4 @@
-import type { H3Event } from 'nitro/deps/h3'
+import type { H3Event } from 'nitro/h3'
 import { defineEventHandler } from 'nitro/h3'
 import { corsConfig } from '~/server/config/cors'
 

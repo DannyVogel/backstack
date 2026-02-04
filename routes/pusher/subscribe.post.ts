@@ -1,4 +1,4 @@
-import type { H3Event } from 'nitro/deps/h3'
+import type { H3Event } from 'nitro/h3'
 import type { SubscriptionRequest } from '~/server/pusher/types/subscription'
 import { HTTPError } from 'h3'
 import { defineHandler, readBody } from 'nitro/h3'

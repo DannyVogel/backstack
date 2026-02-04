@@ -1,4 +1,4 @@
-import type { H3Event } from 'nitro/deps/h3'
+import type { H3Event } from 'nitro/h3'
 import type { UpdateItemRequest } from '~/server/example/types'
 import { HTTPError } from 'h3'
 import { defineHandler, getRouterParam, readBody } from 'nitro/h3'

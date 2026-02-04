@@ -1,4 +1,4 @@
-import type { H3Event } from 'nitro/deps/h3'
+import type { H3Event } from 'nitro/h3'
 import type { SubscriptionRow } from '../types'
 import { getDatabase } from '../index'
 
@@ -136,4 +136,28 @@ export function getDeviceSubscription(
       ? JSON.parse(result.metadata)
       : result.metadata,
   }
+}
+
+export function removeSubscriptionByEndpoint(
+  endpoint: string,
+): boolean {
+  const db = getDatabase()
+
+  const stmt = db.prepare('DELETE FROM subscriptions WHERE endpoint = ?')
+  const result = stmt.run(endpoint)
+
+  return result.changes > 0
+}
+
+export function removeExpiredSubscriptions(): number {
+  const db = getDatabase()
+
+  const stmt = db.prepare(`
+    DELETE FROM subscriptions
+    WHERE expiration_time IS NOT NULL
+      AND datetime(expiration_time) < datetime('now')
+  `)
+  const result = stmt.run()
+
+  return result.changes
 }
