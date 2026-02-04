@@ -1,4 +1,4 @@
-import type { H3Event } from 'nitro/deps/h3'
+import type { H3Event } from 'nitro/h3'
 import { getDeviceSubscription } from '~/server/database/methods/subscriptions'
 
 export class SubscriptionLookupService {

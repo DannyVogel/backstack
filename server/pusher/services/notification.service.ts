@@ -1,5 +1,6 @@
-import type { H3Event } from 'nitro/deps/h3'
+import type { H3Event } from 'nitro/h3'
 import type { NotificationResult } from '../types/notification-result'
+import { removeSubscriptionByEndpoint, removeSubscriptions } from '~/server/database/methods/subscriptions'
 import { logger } from '~/server/logger/logger'
 import { NotificationResultProcessor } from './result-processor.service'
 import { SubscriptionLookupService } from './subscription.service'
@@ -21,32 +22,57 @@ export class NotificationService {
     deviceId: string,
     payload: Record<string, any>,
   ): Promise<NotificationResult> {
-    try {
-      // Find subscription
-      const deviceSubscription = this.subscriptionService.getDeviceSubscription(event, deviceId)
+    // Find subscription first (outside try-catch for webpush)
+    const deviceSubscription = this.subscriptionService.getDeviceSubscription(event, deviceId)
 
-      if (!deviceSubscription) {
-        await logger.warn(
+    if (!deviceSubscription) {
+      await logger.warn(
+        event,
+        `Subscription not found for device ${deviceId}`,
+        {
+          source: 'pusher',
+          metadata: { device_id: deviceId },
+        },
+      )
+      return {
+        device_id: deviceId,
+        success: false,
+        error: 'Subscription not found',
+      }
+    }
+
+    // Check if subscription has expired
+    if (deviceSubscription.expiration_time) {
+      const expirationDate = new Date(deviceSubscription.expiration_time)
+      if (expirationDate < new Date()) {
+        // Remove expired subscription
+        removeSubscriptions(event, [deviceId])
+        await logger.info(
           event,
-          `Subscription not found for device ${deviceId}`,
+          `Subscription expired for device ${deviceId}, removed`,
           {
             source: 'pusher',
-            metadata: { device_id: deviceId },
+            metadata: {
+              device_id: deviceId,
+              expiration_time: deviceSubscription.expiration_time,
+            },
           },
         )
         return {
           device_id: deviceId,
           success: false,
-          error: 'Subscription not found',
+          error: 'Subscription expired (removed)',
         }
       }
+    }
 
-      // Build subscription info for webpush
-      const subscriptionInfo = {
-        endpoint: deviceSubscription.endpoint,
-        keys: deviceSubscription.keys,
-      }
+    // Build subscription info for webpush
+    const subscriptionInfo = {
+      endpoint: deviceSubscription.endpoint,
+      keys: deviceSubscription.keys,
+    }
 
+    try {
       // Send notification
       await this.webPushSender.sendNotification(subscriptionInfo, payload)
 
@@ -56,6 +82,31 @@ export class NotificationService {
       }
     }
     catch (error: any) {
+      // Check if subscription is gone (410) or invalid (404)
+      // These indicate the subscription should be removed
+      const statusCode = error.statusCode || error.status
+      if (statusCode === 410 || statusCode === 404) {
+        // Clean up the stale subscription
+        const removed = removeSubscriptionByEndpoint(subscriptionInfo.endpoint)
+        await logger.info(
+          event,
+          `Subscription expired/invalid for device ${deviceId}, cleaned up: ${removed}`,
+          {
+            source: 'pusher',
+            metadata: {
+              device_id: deviceId,
+              status_code: statusCode,
+              endpoint_removed: removed,
+            },
+          },
+        )
+        return {
+          device_id: deviceId,
+          success: false,
+          error: 'Subscription expired or invalid (removed)',
+        }
+      }
+
       await logger.error(
         event,
         `Web push failed for device ${deviceId}: ${error.message}`,
@@ -65,6 +116,7 @@ export class NotificationService {
             error_type: error.constructor.name,
             device_id: deviceId,
             error_details: error.message,
+            status_code: statusCode,
           },
         },
       )
@@ -103,9 +155,13 @@ export class NotificationService {
       },
     )
 
-    // Send to each device
-    for (const deviceId of deviceIds) {
-      const result = await this.sendToDevice(event, deviceId, payload)
+    // Send to all devices in parallel
+    const results = await Promise.all(
+      deviceIds.map(deviceId => this.sendToDevice(event, deviceId, payload)),
+    )
+
+    // Add all results to processor
+    for (const result of results) {
       this.resultProcessor.addResult(result)
     }
 
