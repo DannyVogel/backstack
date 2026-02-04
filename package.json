@@ -3,10 +3,15 @@
   "type": "module",
   "version": "0.1.0",
   "description": "Open-source template for multi-project backends",
+  "author": "Danny Vogel",
   "license": "MIT",
+  "homepage": "https://github.com/DannyVogel/backstack#readme",
   "repository": {
     "type": "git",
     "url": "https://github.com/DannyVogel/backstack.git"
+  },
+  "bugs": {
+    "url": "https://github.com/DannyVogel/backstack/issues"
   },
   "keywords": [
     "backend",
