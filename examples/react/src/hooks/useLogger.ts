@@ -18,7 +18,8 @@ interface UseLoggerResult {
 }
 
 function getClientId(): string {
-  if (typeof window === 'undefined') return ''
+  if (typeof window === 'undefined')
+    return ''
   let id = localStorage.getItem('backstack_client_id')
   if (!id) {
     id = crypto.randomUUID()
@@ -31,57 +32,58 @@ export function useLogger(config: LoggerConfig): UseLoggerResult {
   const log = useCallback(async (
     level: LogLevel,
     message: string,
-    metadata: Record<string, any> = {}
+    metadata: Record<string, any> = {},
   ) => {
     try {
       await fetch(`${config.baseUrl}/logger`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          ...(config.apiKey ? { 'X-API-Key': config.apiKey } : {})
+          ...(config.apiKey ? { 'X-API-Key': config.apiKey } : {}),
         },
         body: JSON.stringify({
           level,
           message,
           source: 'client',
           client_id: getClientId(),
-          metadata
-        })
+          metadata,
+        }),
       })
-    } catch (err) {
+    }
+    catch (err) {
       console.error('Failed to log:', err)
     }
   }, [config])
 
   const debug = useCallback(
     (message: string, metadata?: Record<string, any>) => log('debug', message, metadata),
-    [log]
+    [log],
   )
 
   const info = useCallback(
     (message: string, metadata?: Record<string, any>) => log('info', message, metadata),
-    [log]
+    [log],
   )
 
   const warn = useCallback(
     (message: string, metadata?: Record<string, any>) => log('warn', message, metadata),
-    [log]
+    [log],
   )
 
   const error = useCallback(
     (message: string, metadata?: Record<string, any>) => log('error', message, metadata),
-    [log]
+    [log],
   )
 
   const critical = useCallback(
     (message: string, metadata?: Record<string, any>) => log('critical', message, metadata),
-    [log]
+    [log],
   )
 
   const logError = useCallback(
     (err: Error, metadata: Record<string, any> = {}) =>
       log('error', err.message, { ...metadata, stack: err.stack, name: err.name }),
-    [log]
+    [log],
   )
 
   return useMemo(() => ({
@@ -91,6 +93,6 @@ export function useLogger(config: LoggerConfig): UseLoggerResult {
     warn,
     error,
     critical,
-    logError
+    logError,
   }), [log, debug, info, warn, error, critical, logError])
 }

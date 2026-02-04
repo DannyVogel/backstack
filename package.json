@@ -3,6 +3,19 @@
   "type": "module",
   "version": "0.1.0",
   "description": "Open-source template for multi-project backends",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/DannyVogel/backstack.git"
+  },
+  "keywords": [
+    "backend",
+    "nitro",
+    "api",
+    "push-notifications",
+    "logging",
+    "template"
+  ],
   "scripts": {
     "build": "nitro build",
     "dev": "nitro dev",
@@ -26,18 +39,5 @@
     "rolldown": "latest",
     "supertest": "^7.2.2",
     "vitest": "latest"
-  },
-  "license": "MIT",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/DannyVogel/backstack.git"
-  },
-  "keywords": [
-    "backend",
-    "nitro",
-    "api",
-    "push-notifications",
-    "logging",
-    "template"
-  ]
+  }
 }

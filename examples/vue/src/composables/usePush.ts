@@ -1,4 +1,4 @@
-import { ref, onMounted } from 'vue'
+import { onMounted, ref } from 'vue'
 
 interface PushConfig {
   baseUrl: string
@@ -36,7 +36,8 @@ export function usePush(config: PushConfig) {
         const registration = await navigator.serviceWorker.ready
         const subscription = await registration.pushManager.getSubscription()
         isSubscribed.value = subscription !== null
-      } catch {
+      }
+      catch {
         isSubscribed.value = false
       }
     }
@@ -62,7 +63,7 @@ export function usePush(config: PushConfig) {
 
       const subscription = await registration.pushManager.subscribe({
         userVisibleOnly: true,
-        applicationServerKey: urlBase64ToUint8Array(config.vapidPublicKey)
+        applicationServerKey: urlBase64ToUint8Array(config.vapidPublicKey),
       })
 
       const subscriptionJson = subscription.toJSON()
@@ -71,15 +72,15 @@ export function usePush(config: PushConfig) {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          ...(config.apiKey ? { 'X-API-Key': config.apiKey } : {})
+          ...(config.apiKey ? { 'X-API-Key': config.apiKey } : {}),
         },
         body: JSON.stringify({
           device_id: getDeviceId(),
           subscription: {
             endpoint: subscriptionJson.endpoint,
-            keys: subscriptionJson.keys
-          }
-        })
+            keys: subscriptionJson.keys,
+          },
+        }),
       })
 
       if (!response.ok) {
@@ -87,9 +88,11 @@ export function usePush(config: PushConfig) {
       }
 
       isSubscribed.value = true
-    } catch (err: any) {
+    }
+    catch (err: any) {
       error.value = err.message
-    } finally {
+    }
+    finally {
       isLoading.value = false
     }
   }
@@ -110,18 +113,20 @@ export function usePush(config: PushConfig) {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          ...(config.apiKey ? { 'X-API-Key': config.apiKey } : {})
+          ...(config.apiKey ? { 'X-API-Key': config.apiKey } : {}),
         },
         body: JSON.stringify({
-          device_ids: [getDeviceId()]
-        })
+          device_ids: [getDeviceId()],
+        }),
       })
 
       localStorage.removeItem('backstack_device_id')
       isSubscribed.value = false
-    } catch (err: any) {
+    }
+    catch (err: any) {
       error.value = err.message
-    } finally {
+    }
+    finally {
       isLoading.value = false
     }
   }
@@ -132,6 +137,6 @@ export function usePush(config: PushConfig) {
     isLoading,
     error,
     subscribe,
-    unsubscribe
+    unsubscribe,
   }
 }

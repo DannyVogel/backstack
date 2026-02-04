@@ -22,15 +22,15 @@ class LoggerClient {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        ...(this.apiKey ? { 'X-API-Key': this.apiKey } : {})
+        ...(this.apiKey ? { 'X-API-Key': this.apiKey } : {}),
       },
       body: JSON.stringify({
         level,
         message,
         source: 'client',
         client_id: this.clientId,
-        metadata
-      })
+        metadata,
+      }),
     })
 
     if (!response.ok) {
@@ -66,7 +66,7 @@ class LoggerClient {
     return this.error(error.message, {
       ...additionalMetadata,
       stack: error.stack,
-      name: error.name
+      name: error.name,
     })
   }
 }

@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 
 interface PushConfig {
   baseUrl: string
@@ -16,7 +16,8 @@ interface UsePushNotificationsResult {
 }
 
 function getDeviceId(): string {
-  if (typeof window === 'undefined') return ''
+  if (typeof window === 'undefined')
+    return ''
   let id = localStorage.getItem('backstack_device_id')
   if (!id) {
     id = crypto.randomUUID()
@@ -38,6 +39,17 @@ export function usePushNotifications(config: PushConfig): UsePushNotificationsRe
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
+  const checkSubscription = useCallback(async () => {
+    try {
+      const registration = await navigator.serviceWorker.ready
+      const subscription = await registration.pushManager.getSubscription()
+      setIsSubscribed(subscription !== null)
+    }
+    catch {
+      setIsSubscribed(false)
+    }
+  }, [])
+
   useEffect(() => {
     const supported = 'serviceWorker' in navigator && 'PushManager' in window
     setIsSupported(supported)
@@ -45,17 +57,7 @@ export function usePushNotifications(config: PushConfig): UsePushNotificationsRe
     if (supported) {
       checkSubscription()
     }
-  }, [])
-
-  const checkSubscription = async () => {
-    try {
-      const registration = await navigator.serviceWorker.ready
-      const subscription = await registration.pushManager.getSubscription()
-      setIsSubscribed(subscription !== null)
-    } catch {
-      setIsSubscribed(false)
-    }
-  }
+  }, [checkSubscription])
 
   const subscribe = useCallback(async () => {
     if (!isSupported) {
@@ -77,7 +79,7 @@ export function usePushNotifications(config: PushConfig): UsePushNotificationsRe
 
       const subscription = await registration.pushManager.subscribe({
         userVisibleOnly: true,
-        applicationServerKey: urlBase64ToUint8Array(config.vapidPublicKey)
+        applicationServerKey: urlBase64ToUint8Array(config.vapidPublicKey),
       })
 
       const subscriptionJson = subscription.toJSON()
@@ -86,16 +88,16 @@ export function usePushNotifications(config: PushConfig): UsePushNotificationsRe
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          ...(config.apiKey ? { 'X-API-Key': config.apiKey } : {})
+          ...(config.apiKey ? { 'X-API-Key': config.apiKey } : {}),
         },
         body: JSON.stringify({
           device_id: getDeviceId(),
           subscription: {
             endpoint: subscriptionJson.endpoint,
             keys: subscriptionJson.keys,
-            expiration_time: subscriptionJson.expirationTime
-          }
-        })
+            expiration_time: subscriptionJson.expirationTime,
+          },
+        }),
       })
 
       if (!response.ok) {
@@ -103,9 +105,11 @@ export function usePushNotifications(config: PushConfig): UsePushNotificationsRe
       }
 
       setIsSubscribed(true)
-    } catch (err: any) {
+    }
+    catch (err: any) {
       setError(err.message)
-    } finally {
+    }
+    finally {
       setIsLoading(false)
     }
   }, [config, isSupported])
@@ -126,18 +130,20 @@ export function usePushNotifications(config: PushConfig): UsePushNotificationsRe
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          ...(config.apiKey ? { 'X-API-Key': config.apiKey } : {})
+          ...(config.apiKey ? { 'X-API-Key': config.apiKey } : {}),
         },
         body: JSON.stringify({
-          device_ids: [getDeviceId()]
-        })
+          device_ids: [getDeviceId()],
+        }),
       })
 
       localStorage.removeItem('backstack_device_id')
       setIsSubscribed(false)
-    } catch (err: any) {
+    }
+    catch (err: any) {
       setError(err.message)
-    } finally {
+    }
+    finally {
       setIsLoading(false)
     }
   }, [config])
@@ -148,6 +154,6 @@ export function usePushNotifications(config: PushConfig): UsePushNotificationsRe
     isLoading,
     error,
     subscribe,
-    unsubscribe
+    unsubscribe,
   }
 }

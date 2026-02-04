@@ -106,7 +106,7 @@ function generateConfigIndex(options: ProjectOptions): string {
     exports.push(`export { loggerConfig } from './logger'`)
   }
 
-  return exports.join('\n') + '\n'
+  return `${exports.join('\n')}\n`
 }
 
 function generateSchema(options: ProjectOptions): string {

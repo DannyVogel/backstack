@@ -1,4 +1,5 @@
 // Service Worker for Push Notifications
+/* eslint-disable no-restricted-globals, no-undef */
 
 self.addEventListener('push', (event) => {
   const data = event.data ? event.data.json() : {}
@@ -12,11 +13,11 @@ self.addEventListener('push', (event) => {
     requireInteraction: data.requireInteraction || false,
     silent: data.silent || false,
     data: data.data || {},
-    actions: data.actions || []
+    actions: data.actions || [],
   }
 
   event.waitUntil(
-    self.registration.showNotification(data.title || 'Notification', options)
+    self.registration.showNotification(data.title || 'Notification', options),
   )
 })
 
@@ -36,7 +37,7 @@ self.addEventListener('notificationclick', (event) => {
       if (clients.openWindow) {
         return clients.openWindow(url)
       }
-    })
+    }),
   )
 })
 

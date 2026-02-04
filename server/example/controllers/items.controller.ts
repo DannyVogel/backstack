@@ -1,21 +1,21 @@
 import type { H3Event } from 'nitro/deps/h3'
-import type { ExampleItemRow } from '~/server/database/types'
 import type { CreateItemRequest, UpdateItemRequest } from '../types'
+import type { ExampleItemRow } from '~/server/database/types'
 import { getDatabase } from '~/server/database/index'
 
-export function getAllItems(event: H3Event): ExampleItemRow[] {
+export function getAllItems(_event: H3Event): ExampleItemRow[] {
   const db = getDatabase()
   const stmt = db.prepare('SELECT * FROM example_items ORDER BY created_at DESC')
   return stmt.all() as ExampleItemRow[]
 }
 
-export function getItemById(event: H3Event, id: number): ExampleItemRow | null {
+export function getItemById(_event: H3Event, id: number): ExampleItemRow | null {
   const db = getDatabase()
   const stmt = db.prepare('SELECT * FROM example_items WHERE id = ?')
   return (stmt.get(id) as ExampleItemRow) || null
 }
 
-export function createItem(event: H3Event, data: CreateItemRequest): ExampleItemRow {
+export function createItem(_event: H3Event, data: CreateItemRequest): ExampleItemRow {
   const db = getDatabase()
   const stmt = db.prepare(`
     INSERT INTO example_items (title, content, created_at, updated_at)
@@ -58,7 +58,7 @@ export function updateItem(event: H3Event, id: number, data: UpdateItemRequest):
   return (stmt.get(...params) as ExampleItemRow) || null
 }
 
-export function deleteItem(event: H3Event, id: number): boolean {
+export function deleteItem(_event: H3Event, id: number): boolean {
   const db = getDatabase()
   const stmt = db.prepare('DELETE FROM example_items WHERE id = ?')
   const result = stmt.run(id)

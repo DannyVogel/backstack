@@ -56,7 +56,7 @@ class PushNotificationClient {
 
     const subscription = await registration.pushManager.subscribe({
       userVisibleOnly: true,
-      applicationServerKey: this.urlBase64ToUint8Array(this.vapidPublicKey)
+      applicationServerKey: this.urlBase64ToUint8Array(this.vapidPublicKey),
     })
 
     const subscriptionJson = subscription.toJSON()
@@ -65,16 +65,16 @@ class PushNotificationClient {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        ...(this.apiKey ? { 'X-API-Key': this.apiKey } : {})
+        ...(this.apiKey ? { 'X-API-Key': this.apiKey } : {}),
       },
       body: JSON.stringify({
         device_id: this.deviceId,
         subscription: {
           endpoint: subscriptionJson.endpoint,
           keys: subscriptionJson.keys,
-          expiration_time: subscriptionJson.expirationTime
-        }
-      })
+          expiration_time: subscriptionJson.expirationTime,
+        },
+      }),
     })
 
     if (!response.ok) {
@@ -96,11 +96,11 @@ class PushNotificationClient {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        ...(this.apiKey ? { 'X-API-Key': this.apiKey } : {})
+        ...(this.apiKey ? { 'X-API-Key': this.apiKey } : {}),
       },
       body: JSON.stringify({
-        device_ids: [this.deviceId]
-      })
+        device_ids: [this.deviceId],
+      }),
     })
 
     localStorage.removeItem('backstack_device_id')
@@ -110,7 +110,8 @@ class PushNotificationClient {
   }
 
   async isSubscribed() {
-    if (!this.isSupported()) return false
+    if (!this.isSupported())
+      return false
     const registration = await navigator.serviceWorker.ready
     const subscription = await registration.pushManager.getSubscription()
     return subscription !== null
