@@ -1,14 +1,16 @@
 # BackStack
 
-Open-source template for multi-project backends. Built with [Nitro](https://v3.nitro.build), SQLite, and TypeScript.
+Open-source backend template for multi-service applications. Built with [Nitro](https://nitro.build), SQLite, and TypeScript.
 
 ## Features
 
-- **Push Notifications** - Web Push API support with VAPID authentication
+- **Push Notifications** - Web Push API with VAPID authentication, automatic subscription cleanup
 - **Structured Logging** - Database-backed logging with viewer UI
 - **Rate Limiting** - Configurable rate limiters with blocking support
 - **CORS Management** - Dynamic origin validation
 - **Example Service** - CRUD template to build upon
+
+**Looking for a client library?** [webpushkit](https://github.com/DannyVogel/webpushkit) is a companion npm package that simplifies push notification setup in frontend applications.
 
 ## Quick Start
 
@@ -23,7 +25,10 @@ npm install
 # Copy environment file
 cp .env.example .env
 
-# Start development server
+# Generate VAPID keys for push notifications
+npx web-push generate-vapid-keys
+
+# Add the generated keys to .env, then start
 npm run dev
 ```
 
@@ -73,23 +78,135 @@ NITRO_LOGGER_VIEWER_KEY=your_viewer_api_key
 NITRO_DATABASE_PATH=./data/backstack.db
 ```
 
-### Generating VAPID Keys
+### Generating Keys
 
 ```bash
+# Generate VAPID keys
 npx web-push generate-vapid-keys
+
+# Generate API keys
+node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
 ```
 
-## API Endpoints
+## Push Notifications
 
-### Push Notifications
+BackStack provides a complete push notification service with automatic subscription management.
+
+### Features
+
+- **VAPID Authentication** - Secure Web Push Protocol implementation
+- **Automatic Cleanup** - Expired and invalid (410/404) subscriptions are automatically removed
+- **Parallel Delivery** - Batch notifications are sent in parallel for better performance
+- **Expiration Checking** - Subscriptions are validated before sending
+- **Detailed Results** - Per-device success/failure reporting with 207 Multi-Status support
+
+### Client Integration
+
+Use [webpushkit](https://github.com/DannyVogel/webpushkit) for easy client-side integration:
+
+```bash
+npm install webpushkit
+npx webpushkit init
+```
+
+```typescript
+import { PushNotificationManager } from 'webpushkit';
+
+const pushManager = new PushNotificationManager({
+  vapidPublicKey: 'your-NITRO_VAPID_PUBLIC_KEY',
+  baseURL: 'http://localhost:3000/pusher', // or your deployed URL
+  apiKey: 'your-NITRO_PUSHER_API_KEY', // optional if using CORS
+});
+
+await pushManager.initialize();
+await pushManager.subscribe();
+```
+
+### Endpoints
 
 | Method | Endpoint | Description |
 |--------|----------|-------------|
-| POST | `/pusher/subscribe` | Subscribe device |
+| POST | `/pusher/subscribe` | Subscribe device to push notifications |
 | POST | `/pusher/unsubscribe` | Unsubscribe devices |
-| POST | `/pusher/notify` | Send notifications |
+| POST | `/pusher/notify` | Send notifications to devices |
 
-### Logging
+### Subscribe
+
+**POST** `/pusher/subscribe`
+
+```json
+{
+  "subscription": {
+    "endpoint": "https://fcm.googleapis.com/fcm/send/...",
+    "keys": {
+      "p256dh": "base64-encoded-key",
+      "auth": "base64-encoded-key"
+    },
+    "expiration_time": "2024-12-31T23:59:59.000Z",
+    "metadata": {}
+  },
+  "device_id": "unique-device-id"
+}
+```
+
+**Response (201):**
+```json
+{
+  "status_code": 201,
+  "message": "Subscribed successfully",
+  "data": {
+    "endpoint": "...",
+    "device_id": "unique-device-id"
+  }
+}
+```
+
+### Notify
+
+**POST** `/pusher/notify`
+
+```json
+{
+  "device_ids": ["device-1", "device-2"],
+  "payload": {
+    "title": "Hello!",
+    "body": "You have a new message",
+    "icon": "/icon.png",
+    "data": { "url": "/messages" }
+  }
+}
+```
+
+**Response (200 or 207):**
+```json
+{
+  "status_code": 207,
+  "message": "1 notifications sent, 1 failed",
+  "data": {
+    "results": [
+      { "device_id": "device-1", "success": true },
+      { "device_id": "device-2", "success": false, "error": "Subscription expired (removed)" }
+    ],
+    "summary": {
+      "total": 2,
+      "successful": 1,
+      "failed": 1
+    }
+  }
+}
+```
+
+### Unsubscribe
+
+**POST** `/pusher/unsubscribe`
+
+```json
+{
+  "device_ids": ["device-1", "device-2"]
+}
+```
+
+## Logging Service
 
 | Method | Endpoint | Description |
 |--------|----------|-------------|
@@ -100,7 +217,9 @@ npx web-push generate-vapid-keys
 | GET | `/logger/stats` | Get log statistics |
 | GET | `/logs` | Log viewer UI |
 
-### Example Service
+## Example Service
+
+A CRUD template demonstrating the service pattern:
 
 | Method | Endpoint | Description |
 |--------|----------|-------------|
@@ -178,6 +297,10 @@ CMD ["node", ".output/server/index.mjs"]
 ### Environment Variables
 
 Ensure all required environment variables are set in your deployment platform.
+
+## Related Projects
+
+- [webpushkit](https://github.com/DannyVogel/webpushkit) - Client library for push notifications
 
 ## License
 
