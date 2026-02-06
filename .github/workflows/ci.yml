@@ -37,4 +37,5 @@ jobs:
           NITRO_VAPID_EMAIL: test@example.com
           NITRO_LOGGER_API_KEY: test_logger
           NITRO_LOGGER_VIEWER_KEY: test_viewer
+          NITRO_EXAMPLE_API_KEY: test_example
           NITRO_DATABASE_PATH: ./data/test.db

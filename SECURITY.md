@@ -5,7 +5,7 @@
 If you discover a security vulnerability, please report it privately:
 
 1. **Do not** open a public GitHub issue
-2. Email security concerns to the maintainer
+2. Email security concerns to backstack@danny-v.me
 3. Include detailed steps to reproduce
 
 ## Response Timeline
