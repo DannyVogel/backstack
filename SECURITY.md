@@ -1,18 +1,8 @@
 # Security Policy
 
-## Reporting a Vulnerability
+## Reporting Issues
 
-If you discover a security vulnerability, please report it privately:
-
-1. **Do not** open a public GitHub issue
-2. Email security concerns to the maintainer
-3. Include detailed steps to reproduce
-
-## Response Timeline
-
-- Acknowledgment: Within 48 hours
-- Initial assessment: Within 1 week
-- Fix timeline: Depends on severity
+For security vulnerabilities, bugs, or feedback, please [open a GitHub issue](https://github.com/DannyVogel/backstack/issues). Include detailed steps to reproduce if applicable.
 
 ## Security Best Practices
 

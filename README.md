@@ -283,16 +283,20 @@ See the `example` service for a complete reference implementation.
 
 ### Docker
 
-```dockerfile
-FROM node:20-alpine
-WORKDIR /app
-COPY package*.json ./
-RUN npm ci --only=production
-COPY . .
-RUN npm run build
-EXPOSE 3000
-CMD ["node", ".output/server/index.mjs"]
+A multi-stage `Dockerfile` is included. Build and run with Docker Compose:
+
+```bash
+docker compose up -d
 ```
+
+Or build manually:
+
+```bash
+docker build -t backstack .
+docker run -p 3000:3000 --env-file .env backstack
+```
+
+Deployment configs for [Fly.io](https://fly.io) (`fly.toml`) and [Render](https://render.com) (`render.yaml`) are also included.
 
 ### Environment Variables
 
