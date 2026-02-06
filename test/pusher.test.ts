@@ -1,12 +1,12 @@
 import { describe, expect, it } from 'vitest'
-import { validateSubscriptionKeys, normalizeSubscriptionKeys } from '~/server/pusher/utils/key-validation'
-import { successResponse, errorResponse } from '~/server/pusher/utils/response'
 import { NotificationResultProcessor } from '~/server/pusher/services/result-processor.service'
+import { normalizeSubscriptionKeys, validateSubscriptionKeys } from '~/server/pusher/utils/key-validation'
+import { errorResponse, successResponse } from '~/server/pusher/utils/response'
 
 // Generate valid p256dh (65 bytes) and auth (16 bytes) keys in base64url format
 function makeValidKeys() {
   const p256dh = Buffer.alloc(65, 0x04).toString('base64url')
-  const auth = Buffer.alloc(16, 0xab).toString('base64url')
+  const auth = Buffer.alloc(16, 0xAB).toString('base64url')
   return { p256dh, auth }
 }
 
@@ -56,7 +56,7 @@ describe('pusher key-validation', () => {
       // 32 bytes instead of 65
       const keys = {
         p256dh: Buffer.alloc(32, 0x01).toString('base64url'),
-        auth: Buffer.alloc(16, 0xab).toString('base64url'),
+        auth: Buffer.alloc(16, 0xAB).toString('base64url'),
       }
       expect(() => validateSubscriptionKeys(keys)).toThrow('p256dh key must decode to exactly 65 bytes')
     })
@@ -64,7 +64,7 @@ describe('pusher key-validation', () => {
     it('should reject auth that decodes to wrong byte length', () => {
       const keys = {
         p256dh: Buffer.alloc(65, 0x04).toString('base64url'),
-        auth: Buffer.alloc(8, 0xab).toString('base64url'),
+        auth: Buffer.alloc(8, 0xAB).toString('base64url'),
       }
       expect(() => validateSubscriptionKeys(keys)).toThrow('auth key must decode to exactly 16 bytes')
     })

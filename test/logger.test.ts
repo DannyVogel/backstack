@@ -154,7 +154,7 @@ describe('logger database methods', () => {
   })
 })
 
-describe('StructuredLogger', () => {
+describe('structuredLogger', () => {
   let loggerInstance: StructuredLogger
 
   beforeEach(() => {
