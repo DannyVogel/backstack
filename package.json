@@ -1,7 +1,7 @@
 {
   "name": "backstack",
   "type": "module",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "description": "Open-source template for multi-project backends",
   "author": "Danny Vogel",
   "license": "MIT",
